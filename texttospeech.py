@@ -8,6 +8,8 @@ from google.cloud import speech
 import pyaudio
 from six.moves import queue
 
+import checksdt
+
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
@@ -126,10 +128,23 @@ def listen_print_loop(responses):
 
         else:
             print(transcript + overwrite_chars)
-
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
-            if re.search(r"\b(exit|quit)\b", transcript, re.I):
+            if re.search(r"\b(note|ghi chú)\b", transcript, re.I):
+                print("Đang ghi chú..")  
+
+            if re.search(r"\b(tin nhắn)\b", transcript, re.I):
+                print("Đọc số điện thoại..")    
+                if re.search(r"\b(Linh)\b", transcript, re.I):
+                    print("Tin nhắn là..",transcript)      
+
+            if re.search(r"\b(giúp|cứu)\b", transcript, re.I):
+                print("Tín hiệu cầu cứu..")    
+
+            if re.search(r"\b(tọa độ|vị trí)\b", transcript, re.I):
+                print("Vị trí của bạn là..")            
+
+            if re.search(r"\b(exit|quit|tắt|thoát)\b", transcript, re.I):
                 print("Exiting..")
                 break
 

@@ -8,7 +8,7 @@ from google.cloud import speech
 import pyaudio
 from six.moves import queue
 
-import checksdt
+import check_phone_number
 
 # Audio recording parameters
 RATE = 16000

@@ -7,6 +7,8 @@ from google.cloud import speech
 
 import pyaudio
 from six.moves import queue
+import pyttsx3
+
 
 import check_phone_number
 import get_location_info
@@ -84,6 +86,22 @@ class MicrophoneStream(object):
             yield b"".join(data)
 
 
+def speak(text_to_speak):
+    engine = pyttsx3.init()
+    voices = engine.getProperty("voices")
+    engine.setProperty(
+        "voice", voices[1].id
+    )  # Setting the voice to the second voice in the list
+
+    rate = engine.getProperty("rate")  # Getting the current speech rate
+    engine.setProperty(
+        "rate", rate - 80
+    )  # Reducing the speech rate by 50 (adjust this value as needed)
+
+    engine.say(text_to_speak)
+    engine.runAndWait()
+
+
 def listen_print_loop(responses):
     """Iterates through server responses and prints them.
 
@@ -132,24 +150,26 @@ def listen_print_loop(responses):
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
             if re.search(r"\b(tin nhắn)\b", transcript, re.I):
-                print("Đang xử lý..")    
+                print("Đang xử lý..")
                 if check_phone_number.check_phone_number(transcript):
                     if check_phone_number.get_text(transcript) != "None":
-                        print("Gửi tin nhắn với nội dung..",check_phone_number.get_text(transcript)) 
+                        print(
+                            "Gửi tin nhắn với nội dung..",
+                            check_phone_number.get_text(transcript),
+                        )
                         # Hàm gửi tin nhắn với sdt:check_phone_number.check_phone_number(transcript) | Nội dung: check_phone_number.get_text(transcript)
 
             if re.search(r"\b(giúp|cứu)\b", transcript, re.I):
-                print("Tín hiệu cầu cứu..")    
+                print("Tín hiệu cầu cứu..")
                 # Hàm lấy vị trí
                 # Hàm gửi tin nhắn sos kèm vị trí
 
             if re.search(r"\b(tọa độ|vị trí)\b", transcript, re.I):
-                print("Vị trí của bạn là..")   
+                print("Vị trí của bạn là..")
                 # Hàm lấy vị trí
                 latitude = 10.852046
                 longitude = 106.772156
                 print(get_location_info.get_location_info(latitude, longitude))
-
 
             if re.search(r"\b(exit|quit|tắt|thoát)\b", transcript, re.I):
                 print("Exiting..")
@@ -163,7 +183,7 @@ def main():
     # for a list of supported languages.
     language_code = "vi-VN"  # a BCP-47 language tag
 
-    client = speech.SpeechClient.from_service_account_file('key.json')
+    client = speech.SpeechClient.from_service_account_file("key.json")
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=RATE,

@@ -7,8 +7,6 @@ from google.cloud import speech
 
 import pyaudio
 from six.moves import queue
-import pyttsx3
-
 
 import check_phone_number
 import get_location_info
@@ -86,22 +84,6 @@ class MicrophoneStream(object):
             yield b"".join(data)
 
 
-def speak(text_to_speak):
-    engine = pyttsx3.init()
-    voices = engine.getProperty("voices")
-    engine.setProperty(
-        "voice", voices[1].id
-    )  # Setting the voice to the second voice in the list
-
-    rate = engine.getProperty("rate")  # Getting the current speech rate
-    engine.setProperty(
-        "rate", rate - 80
-    )  # Reducing the speech rate by 50 (adjust this value as needed)
-
-    engine.say(text_to_speak)
-    engine.runAndWait()
-
-
 def listen_print_loop(responses):
     """Iterates through server responses and prints them.
 
@@ -164,7 +146,9 @@ def listen_print_loop(responses):
                 # Hàm lấy vị trí
                 # Hàm gửi tin nhắn sos kèm vị trí
 
-            if re.search(r"\b(tọa độ|vị trí)\b", transcript, re.I):
+            if re.search(
+                r"\b(tọa độ|vị trí|tôi đang ở đâu|ở đây là đâu)\b", transcript, re.I
+            ):
                 print("Vị trí của bạn là..")
                 # Hàm lấy vị trí
                 latitude = 10.852046
